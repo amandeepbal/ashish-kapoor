@@ -1,0 +1,26 @@
+{
+  "name": "ashish-kapoor",
+  "version": "1.0.0",
+  "description": "A simple App to test Heroku framework",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2",
+    "http": "0.0.0",
+    "node-cache": "^4.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amandeepbal/ashish-kapoor"
+  },
+  "keywords": [
+    "node",
+    "heroku",
+    "express"
+  ]
+}
