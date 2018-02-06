@@ -16,6 +16,7 @@ app.get('/', function (req, res) {
 // set the cache
         var success = myCache.set("myKey", obj, 10000);
         res.send('cache has been set:' + success);
+        console.log('Testing Cache set');
     } else {
         res.send('data from cache:' + JSON.stringify(value));
     }
