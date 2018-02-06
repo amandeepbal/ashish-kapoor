@@ -4,44 +4,65 @@ var express = require('express');
 var http = require('http');
 var NodeCache = require("node-cache");
 var pg = require('pg');
+var db = require('./db.js');
 
 var myCache = new NodeCache();
+
+const config = {
+    host:'ec2-50-19-105-188.compute-1.amazonaws.com',
+    ssl: true,
+    user: 'pmemqhietpvqty',
+    database: 'dcf1185buk5dbe',
+    password: '43932c604eb9646db5307cd0987e34f0536ca6723f68dd3fe85381d32d857a70',
+    port: 5432
+};
+
 
 var app = express()
 var port = process.env.PORT || 3000;
 
-app.get('/', function (req, res) {
+const pool = new pg.Pool(config);
 
-    var obj = {my: "Special", variable: 42};
-
-    var value = myCache.get("myKey");
-    if (value == undefined) {
-// set the cache
-        var success = myCache.set("myKey", obj, 10000);
-        res.send('cache has been set:' + success);
-        console.log('Testing Cache set');
-    } else {
-        res.send('data from cache:' + JSON.stringify(value));
+app.get('/db', (req, res, next) => {
+    pool.connect(function (err, client, done) {
+    if (err) {
+        console.log("Error while connecting to DB" + err);
     }
+    client.query('SELECT * FROM contest', function (err, result) {
+        done();
+        if (err) {
+            console.log(err);
+            res.status(400).send(JSON.stringify(err));
+        }else{
+            res.status(200).send(JSON.stringify(result.rows));
+        }
+    })
 })
+});
 
+app.post('/db', (req, res, next) => {
+    var data = {};
+    data.contestId = 0;
+    data.propertyURL = "http://yahoo.com/prop/1";
+    data.contestHeading = 'This is a test Header';
 
-app.get('/db', function (request, response) {
-    pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-        client.query('SELECT * FROM test_table', function(err, result) {
-            done();
-            if (err){ console.error(err); response.send("Error " + err);
-            } else {
-                response.send(JSON.stringify(result.rows) );
-            }
+    db.contest.findOrCreate({where: {contestId: data.contestId}, defaults: {
+            propertyURL:data.propertyURL,
+            active: true,
+            contestHeading: data.contestHeading
+    }}).spread((contest, created) => {
+            res.status(200).send(created);
+            console.log(created)
         });
-    });
 });
 
 // Start the server
-http.createServer(app).listen(port, function () {
-    console.log('Your server is listening on ', 'http://localhost:' + port);
+db.sequelize.sync({force:true}).then(function () {
+    http.createServer(app).listen(port, function () {
+        console.log('Your server is listening on ', 'http://localhost:' + port);
+    });
 });
+
 
 
 
