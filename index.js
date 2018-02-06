@@ -6,7 +6,7 @@ var NodeCache = require("node-cache");
 var myCache = new NodeCache();
 
 var app = express()
-
+var port = process.env.PORT || 3000;
 app.get('/', function (req, res) {
 
     var obj = {my: "Special", variable: 42};
@@ -23,9 +23,8 @@ app.get('/', function (req, res) {
 })
 
 // Start the server
-http.createServer(app).listen(3000, function () {
-    console.log('Your server is listening on ', 'http://localhost' );
-    console.log('Swagger-ui is available on ', 'http://localhost:3000');
+http.createServer(app).listen(port, function () {
+    console.log('Your server is listening on ', 'http://localhost:' + port);
 });
 
 
